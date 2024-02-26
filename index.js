@@ -6,7 +6,7 @@ const displayNumber = document.getElementById("display-number");
 const displayOutput = document.getElementById("output-wrapper");
 console.log(keys);
 
-sum = 0;
+let sum = 0;
 let firstNumber = false;
 let lastOperand = "";
 let currentOperand = "";
