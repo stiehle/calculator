@@ -142,8 +142,8 @@ function calcSum(operand) {
   }
 }
 
-function setNumberAndComma(setfirstNumber, setStatusComma) {
-  firstNumber = setfirstNumber;
+function setNumberAndComma(setFirstNumber, setStatusComma) {
+  firstNumber = setFirstNumber;
   statusComma = setStatusComma;
 }
 
