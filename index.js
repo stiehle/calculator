@@ -68,6 +68,7 @@ function makeKeys() {
     } else {
       keysEl.innerHTML += "<p></p>";
     }
+
     buttonAddClass = "";
   }
 }
@@ -141,8 +142,8 @@ function calcSum(operand) {
   }
 }
 
-function setNumberAndComma(setFirstNumber, setStatusComma) {
-  firstNumber = setFirstNumber;
+function setNumberAndComma(setfirstNumber, setStatusComma) {
+  firstNumber = setfirstNumber;
   statusComma = setStatusComma;
 }
 
