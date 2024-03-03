@@ -1,17 +1,15 @@
-console.log("calculator");
+const keysEl = document.getElementsByClassName("keys")[0];
+const displayCalcEl = document.getElementsByClassName("display-calc")[0];
+const displayNumberEl = document.getElementsByClassName("display-number")[0];
+const displayOutputEl = document.getElementsByClassName("output-wrapper")[0];
 
-const keys = document.getElementById("keys");
-const displayCalc = document.getElementById("display-calc");
-const displayNumber = document.getElementById("display-number");
-const displayOutput = document.getElementById("output-wrapper");
-console.log(keys);
-
-sum = 0;
-let firstNumber = false;
+let sum = 0;
 let lastOperand = "";
 let currentOperand = "";
 let lastNumber = "";
 let currentNumber = sum;
+let firstNumber = false;
+let statusComma = false;
 
 setDisplayCalc("");
 setDisplayNumber(sum);
@@ -32,114 +30,86 @@ const keysLabel = [
   "2",
   "3",
   "-",
-  "CE",
   "0",
+  ".",
   "=",
   "+",
+  "x",
+  "CE",
+  "x",
+  "x",
 ];
 
 makeKeys();
 
 function makeKeys() {
+  let buttonAddClass = "";
+
   for (let i = 0; i < keysLabel.length; i++) {
-    // console.log(i);
     buttonClick = '"' + keysLabel[i] + '"';
     buttonLabel = keysLabel[i];
-    console.log(i, buttonLabel);
+
     if (operators.includes(keysLabel[i])) {
-      keys.innerHTML +=
-        "<button class='button-1' onclick='checkKey(" +
-        buttonClick +
-        ")'>" +
-        buttonLabel +
-        "</button>";
-    } else if (commands.includes(keysLabel[i])) {
-      keys.innerHTML +=
-        "<button class='button-2' onclick='checkKey(" +
+      buttonAddClass = " button-1";
+    }
+    if (commands.includes(keysLabel[i])) {
+      buttonAddClass = " button-2";
+    }
+
+    if (keysLabel[i] !== "x") {
+      keysEl.innerHTML +=
+        "<button class='button" +
+        buttonAddClass +
+        "' onclick='checkKey(" +
         buttonClick +
         ")'>" +
         buttonLabel +
         "</button>";
     } else {
-      keys.innerHTML +=
-        "<button class='button' onclick='checkKey(" +
-        buttonClick +
-        ")'>" +
-        buttonLabel +
-        "</button>";
+      keysEl.innerHTML += "<p></p>";
     }
+    buttonAddClass = "";
   }
 }
 
-function checkKey(nr) {
-  console.log("press", nr);
-
-  // if (operators.includes(nr)) {
-  //   calcSum(nr);
-  // } else if (nr === "=") {
-  //   calculateEnd(nr);
-  // } else if (nr === "CE") {
-  //   resetCalulator(0);
-  // } else {
-  //   addDisplayNumber(nr);
-  // }
-
-  if (operators.includes(nr)) {
-    console.log("--> operator");
-    calcSum(nr);
-  } else if (commands.includes(nr)) {
-    console.log("--> command");
-    doCommands(nr);
-    // if (nr === "=") calculateEnd(nr);
-    // if (nr === "CE") resetCalulator(0);
+function checkKey(number) {
+  if (operators.includes(number)) {
+    calcSum(number);
+  } else if (commands.includes(number)) {
+    doCommands(number);
   } else {
-    console.log("--> number");
-    addDisplayNumber(nr);
+    addDisplayNumber(number);
   }
 }
 
-// if (nr === "=") {
-//   console.log("Key " + nr + " pressed");
-//   calculateEnd(nr);
-// } else if (nr === "CE") {
-//   console.log("Key " + nr + " pressed");
-//   resetCalulator(0);
-// } else if (nr === "+") {
-//   console.log("Key " + nr + " pressed");
-//   calcSum(nr);
-// } else if (nr === "-") {
-//   console.log("Key " + nr + " pressed");
-//   calcSum(nr);
-// } else if (nr === "*") {
-//   console.log("Key " + nr + " pressed");
-//   calcSum(nr);
-// } else if (nr === "/") {
-//   console.log("Key " + nr + " pressed");
-//   calcSum(nr);
-// } else {
-//   console.log("Key " + nr + " pressed");
-//   addDisplayNumber(nr);
-// }
-
-function addDisplayNumber(nr) {
+function addDisplayNumber(number) {
   if (firstNumber) {
-    displayNumber.innerHTML += nr;
-  } else {
-    displayNumber.innerHTML = nr;
-    console.log("-firstNumber-", firstNumber);
-    if (nr != "0") {
-      firstNumber = true;
+    if (number != ".") {
+      displayNumberEl.innerHTML += number;
+    } else if (statusComma === false) {
+      displayNumberEl.innerHTML += number;
+      statusComma = true;
     }
-    console.log("-firstNumber-", firstNumber);
+  } else {
+    if (number === "." && statusComma === false) {
+      displayNumberEl.innerHTML = "0" + number;
+      setNumberAndComma(true, true);
+    } else {
+      displayNumberEl.innerHTML = number;
+
+      if (number != "0") {
+        firstNumber = true;
+      }
+    }
   }
 }
 
-function setDisplayCalc(nr) {
-  displayCalc.innerHTML = nr;
+function setDisplayCalc(number) {
+  displayCalcEl.innerHTML = number;
 }
 
-function setDisplayNumber(nr) {
-  displayNumber.innerHTML = nr;
+function setDisplayNumber(number) {
+  displayNumberEl.innerHTML = number;
 }
 
 function doCommands(com) {
@@ -153,78 +123,67 @@ function doCommands(com) {
 }
 
 function calcSum(operand) {
-  console.log(operand);
-  currentNumber = displayNumber.innerHTML;
+  currentNumber = displayNumberEl.innerHTML;
 
   if (lastOperand === "") {
     lastOperand = operand;
     lastNumber = currentNumber;
     setDisplayCalc(lastNumber + " " + lastOperand);
-    firstNumber = false;
+    setNumberAndComma(false, false);
   } else {
     sum = calculate(lastNumber, currentNumber, lastOperand);
     showCalculation(lastNumber, currentNumber, lastOperand, "=", sum);
-    console.log(sum);
-
     setDisplayNumber(sum);
     setDisplayCalc(sum + " " + operand);
+    setNumberAndComma(false, false);
     lastOperand = operand;
-    firstNumber = false;
     lastNumber = sum;
   }
 }
 
+function setNumberAndComma(setFirstNumber, setStatusComma) {
+  firstNumber = setFirstNumber;
+  statusComma = setStatusComma;
+}
+
 function calculateEnd(operand) {
-  currentNumber = displayNumber.innerHTML;
-  console.log("-End->!", lastNumber, currentNumber, lastOperand, operand);
+  currentNumber = displayNumberEl.innerHTML;
+
   if (lastNumber === "") {
     sum = currentNumber;
     setDisplayNumber(sum);
-    console.log("sum->", sum);
     showCalculation(lastNumber, currentNumber, lastOperand, operand, sum);
   } else {
     sum = calculate(lastNumber, currentNumber, lastOperand);
-    console.log("sum---->", sum);
     showCalculation(lastNumber, currentNumber, lastOperand, operand, sum);
-
     resetCalulator(sum);
-
-    // lastNumber = "";
-    // lastOperand = "";
-    // firstNumber = false;
-    // setDisplayCalc("");
-    // setDisplayNumber(sum);
   }
 }
 
-function calculate(last, current, op) {
+function calculate(last, current, operand) {
   let calcSum;
-  if (op === "+") {
+  if (operand === "+") {
     calcSum = Number(last) + Number(current);
-  } else if (op === "-") {
+  } else if (operand === "-") {
     calcSum = Number(last) - Number(current);
-  } else if (op === "*") {
+  } else if (operand === "*") {
     calcSum = Number(last) * Number(current);
-  } else if (op === "/") {
+  } else if (operand === "/") {
     calcSum = Number(last) / Number(current);
   }
-  console.log("fixedNum -->", calcSum.toFixed(4));
 
+  calcSum = Math.round(calcSum * 100000000) / 100000000;
   return calcSum;
 }
 
 function showCalculation(last, current, lastOperand, operand, sum) {
   out = last + " " + lastOperand + " " + current + " " + operand + " " + sum;
-  console.log(out);
-  const x = displayOutput.innerHTML;
-  displayOutput.innerHTML = "<h3>" + out + "</h3>" + x;
+
+  const lastOutput = displayOutputEl.innerHTML;
+  displayOutputEl.innerHTML = "<h3>" + out + "</h3>" + lastOutput;
 }
 
 function resetCalulator(sum) {
-  console.log("RESET !");
-  // sum = 0;
-  firstNumber = false;
-
   lastOperand = "";
   currentOperand = "";
   lastNumber = "";
@@ -232,7 +191,8 @@ function resetCalulator(sum) {
 
   setDisplayCalc("");
   setDisplayNumber(sum);
+  setNumberAndComma(false, false);
 }
 function resetOutput() {
-  displayOutput.innerHTML = "";
+  displayOutputEl.innerHTML = "";
 }
