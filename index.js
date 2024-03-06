@@ -3,6 +3,8 @@ const displayCalcEl = document.getElementsByClassName("display-calc")[0];
 const displayNumberEl = document.getElementsByClassName("display-number")[0];
 const displayOutputEl = document.getElementsByClassName("output-wrapper")[0];
 
+const menuEL = document.getElementsByClassName("menu")[0];
+
 let sum = 0;
 let lastOperand = "";
 let currentOperand = "";
@@ -34,10 +36,7 @@ const keysLabel = [
   ".",
   "=",
   "+",
-  "x",
   "CE",
-  "x",
-  "x",
 ];
 
 makeKeys();
@@ -46,29 +45,13 @@ function makeKeys() {
   let buttonAddClass = "";
 
   for (let i = 0; i < keysLabel.length; i++) {
-    buttonClick = '"' + keysLabel[i] + '"';
-    buttonLabel = keysLabel[i];
-
     if (operators.includes(keysLabel[i])) {
       buttonAddClass = " button-1";
     }
     if (commands.includes(keysLabel[i])) {
       buttonAddClass = " button-2";
     }
-
-    if (keysLabel[i] !== "x") {
-      keysEl.innerHTML +=
-        "<button class='button" +
-        buttonAddClass +
-        "' onclick='checkKey(" +
-        buttonClick +
-        ")'>" +
-        buttonLabel +
-        "</button>";
-    } else {
-      keysEl.innerHTML += "<p></p>";
-    }
-
+    keysEl.innerHTML += `<button class="button${buttonAddClass}" onclick=checkKey("${keysLabel[i]}")>${keysLabel[i]}</button> `;
     buttonAddClass = "";
   }
 }
@@ -79,28 +62,64 @@ function checkKey(number) {
   } else if (commands.includes(number)) {
     doCommands(number);
   } else {
-    addDisplayNumber(number);
+    if (number === ".") {
+      addDisplayComma(number);
+    } else {
+      addDisplayNumber(number);
+    }
   }
 }
 
+// function addDisplayNumber(number) {
+//   switch (firstNumber) {
+//     case true:
+//       displayNumberEl.innerHTML += number;
+//       break;
+
+//     case false:
+//       displayNumberEl.innerHTML = number;
+
+//       if (number !== "0") {
+//         firstNumber = true;
+//       }
+//       break;
+//   }
+// }
+
 function addDisplayNumber(number) {
   if (firstNumber) {
-    if (number != ".") {
-      displayNumberEl.innerHTML += number;
-    } else if (statusComma === false) {
+    displayNumberEl.innerHTML += number;
+  } else {
+    displayNumberEl.innerHTML = number;
+
+    if (number !== "0") {
+      firstNumber = true;
+    }
+  }
+}
+
+// function addDisplayComma(number) {
+//   switch (statusComma) {
+//     case false:
+//       if (firstNumber) {
+//         displayNumberEl.innerHTML += number;
+//         statusComma = true;
+//       } else {
+//         displayNumberEl.innerHTML = "0" + number;
+//         setFirstNumberAndComma(true, true);
+//       }
+//       break;
+//   }
+// }
+
+function addDisplayComma(number) {
+  if (!statusComma) {
+    if (firstNumber) {
       displayNumberEl.innerHTML += number;
       statusComma = true;
-    }
-  } else {
-    if (number === "." && statusComma === false) {
-      displayNumberEl.innerHTML = "0" + number;
-      setNumberAndComma(true, true);
     } else {
-      displayNumberEl.innerHTML = number;
-
-      if (number != "0") {
-        firstNumber = true;
-      }
+      displayNumberEl.innerHTML = "0" + number;
+      setFirstNumberAndComma(true, true);
     }
   }
 }
@@ -110,7 +129,8 @@ function setDisplayCalc(number) {
 }
 
 function setDisplayNumber(number) {
-  displayNumberEl.innerHTML = number;
+  // displayNumberEl.innerHTML = number;
+  displayNumberEl.innerHTML = roundCalculateSum(number);
 }
 
 function doCommands(com) {
@@ -126,23 +146,23 @@ function doCommands(com) {
 function calcSum(operand) {
   currentNumber = displayNumberEl.innerHTML;
 
-  if (lastOperand === "") {
+  if (!lastOperand) {
     lastOperand = operand;
     lastNumber = currentNumber;
     setDisplayCalc(lastNumber + " " + lastOperand);
-    setNumberAndComma(false, false);
+    setFirstNumberAndComma(false, false);
   } else {
     sum = calculate(lastNumber, currentNumber, lastOperand);
     showCalculation(lastNumber, currentNumber, lastOperand, "=", sum);
     setDisplayNumber(sum);
     setDisplayCalc(sum + " " + operand);
-    setNumberAndComma(false, false);
+    setFirstNumberAndComma(false, false);
     lastOperand = operand;
     lastNumber = sum;
   }
 }
 
-function setNumberAndComma(setFirstNumber, setStatusComma) {
+function setFirstNumberAndComma(setFirstNumber, setStatusComma) {
   firstNumber = setFirstNumber;
   statusComma = setStatusComma;
 }
@@ -150,7 +170,7 @@ function setNumberAndComma(setFirstNumber, setStatusComma) {
 function calculateEnd(operand) {
   currentNumber = displayNumberEl.innerHTML;
 
-  if (lastNumber === "") {
+  if (!lastNumber) {
     sum = currentNumber;
     setDisplayNumber(sum);
     showCalculation(lastNumber, currentNumber, lastOperand, operand, sum);
@@ -173,15 +193,22 @@ function calculate(last, current, operand) {
     calcSum = Number(last) / Number(current);
   }
 
-  calcSum = Math.round(calcSum * 100000000) / 100000000;
   return calcSum;
 }
 
+function roundCalculateSum(sum) {
+  return Math.round(sum * 100000000) / 100000000;
+}
+
 function showCalculation(last, current, lastOperand, operand, sum) {
-  out = last + " " + lastOperand + " " + current + " " + operand + " " + sum;
+  // out = last + " " + lastOperand + " " + current + " " + operand + " " + sum;
+  out = `${last} ${lastOperand} ${current} ${operand} ${roundCalculateSum(
+    sum
+  )}`;
 
   const lastOutput = displayOutputEl.innerHTML;
-  displayOutputEl.innerHTML = "<h3>" + out + "</h3>" + lastOutput;
+  // displayOutputEl.innerHTML = "<h3>" + out + "</h3>" + lastOutput;
+  displayOutputEl.innerHTML = `<h3> ${out} </h3> ${lastOutput}`;
 }
 
 function resetCalulator(sum) {
@@ -192,8 +219,14 @@ function resetCalulator(sum) {
 
   setDisplayCalc("");
   setDisplayNumber(sum);
-  setNumberAndComma(false, false);
+  setFirstNumberAndComma(false, false);
 }
+
 function resetOutput() {
   displayOutputEl.innerHTML = "";
+}
+
+function showMenu() {
+  console.log("Hallo Menu");
+  menuEL.classList.toggle("menu-active");
 }
