@@ -19,25 +19,7 @@ setDisplayNumber(sum);
 const operators = ["+", "-", "*", "/"];
 const commands = ["=", "CE", "C"];
 
-const keysLabel = [
-  "7",
-  "8",
-  "9",
-  "/",
-  "4",
-  "5",
-  "6",
-  "*",
-  "1",
-  "2",
-  "3",
-  "-",
-  "0",
-  ".",
-  "=",
-  "+",
-  "CE",
-];
+const keysLabel = ["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "=", "+", "CE"];
 
 makeKeys();
 
@@ -155,7 +137,7 @@ function calcSum(operand) {
     sum = calculate(lastNumber, currentNumber, lastOperand);
     showCalculation(lastNumber, currentNumber, lastOperand, "=", sum);
     setDisplayNumber(sum);
-    setDisplayCalc(sum + " " + operand);
+    setDisplayCalc(roundCalculateSum(sum) + " " + operand); // only rounded sum
     setFirstNumberAndComma(false, false);
     lastOperand = operand;
     lastNumber = sum;
@@ -202,9 +184,7 @@ function roundCalculateSum(sum) {
 
 function showCalculation(last, current, lastOperand, operand, sum) {
   // out = last + " " + lastOperand + " " + current + " " + operand + " " + sum;
-  out = `${last} ${lastOperand} ${current} ${operand} ${roundCalculateSum(
-    sum
-  )}`;
+  out = `${last} ${lastOperand} ${current} ${operand} ${roundCalculateSum(sum)}`;
 
   const lastOutput = displayOutputEl.innerHTML;
   // displayOutputEl.innerHTML = "<h3>" + out + "</h3>" + lastOutput;
